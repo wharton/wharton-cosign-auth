@@ -1,6 +1,6 @@
 from django.contrib.auth.backends import RemoteUserBackend
 
-from penn.utilities import call_wisp_api
+from penn_auth.utilities import call_wisp_api
 
 class PennRemoteUserBackend(RemoteUserBackend):
   def configure_user(self, user):

@@ -2,7 +2,7 @@ from django.core.exceptions import PermissionDenied
 
 from functools import wraps
 
-from penn.utilities import call_wisp_api
+from penn_auth.utilities import call_wisp_api
 
 def wharton_permission(permission):
   def wharton(func):
