@@ -1,5 +1,5 @@
-Django Penn CoSign Custom User Template
-=======================================
+Django Penn CoSign Login and Permissions
+========================================
 
 Installing CoSign and setting up Apache
 ---------------------------------------
@@ -45,32 +45,6 @@ INSTALLED_APPS = (
     'bootstrap3',
     'penn_auth',
 )
-```
-
-Or, for prod.py only (handy, if you want to use Django's auth for local dev):
-
-```
-MIDDLEWARE_CLASSES += (
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.RemoteUserMiddleware',
-)
-
-AUTHENTICATION_BACKENDS += (
-    'penn_auth.penn_auth.PennRemoteUserBackend',
-    'django.contrib.auth.backends.RemoteUserBackend',
-)
-
-INSTALLED_APPS += (
-    'penn_auth',
-)
-```
-
-Then, you can begin to customize the models.py (and auth_backend.py if necessary).
-
-Don't forget to run this to create the necessary pennuser_pennuser table in your Django Project's database after adding the pennuser app to INSTALLED_APPS:
-
-```
-python manage.py migrate
 ```
 
 Feel free to contact me with questions: sturoscy@wharton.upenn.edu
