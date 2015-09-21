@@ -37,13 +37,13 @@ MIDDLEWARE_CLASSES = (
 )
 
 AUTHENTICATION_BACKENDS = (
-    'pennuser.auth_backends.PennRemoteUserBackend',
+    'penn_auth.remote_user.PennRemoteUserBackend',
     'django.contrib.auth.backends.RemoteUserBackend',
 )
 
 INSTALLED_APPS = (
     'bootstrap3',
-    'pennuser',
+    'penn_auth',
 )
 ```
 
@@ -56,7 +56,7 @@ MIDDLEWARE_CLASSES += (
 )
 
 AUTHENTICATION_BACKENDS += (
-    'pennuser.auth_backends.PennRemoteUserBackend',
+    'penn_auth.penn_auth.PennRemoteUserBackend',
     'django.contrib.auth.backends.RemoteUserBackend',
 )
 
