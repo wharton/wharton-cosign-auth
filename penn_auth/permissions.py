@@ -19,9 +19,3 @@ def wharton_permission(permission):
         raise PermissionDenied
     return wrapper
   return wharton
-
-class WhartonPermission(object):
-    @classmethod
-    def as_view(cls, **initkwargs):
-        view = super(WhartonPermission, cls).as_view(**initkwargs)
-        return wharton_permission(view)
