@@ -52,3 +52,4 @@ Feel free to contact me with questions: sturoscy@wharton.upenn.edu
 CONTRIBUTORS:
 -------------
 * Stephen Turoscy
+* Timothy Allen
