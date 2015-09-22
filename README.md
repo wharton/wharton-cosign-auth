@@ -1,5 +1,5 @@
-Django Penn CoSign Login and Permissions
-========================================
+Django Wharton CoSign Login and Permissions
+===========================================
 
 Installing CoSign and setting up Apache
 ---------------------------------------
@@ -10,11 +10,11 @@ Installing the Django app
 -------------------------
 Add this line to the requirements.txt of your Django project:
 
-`git+https://github.com/wharton/django-penn-auth.git`
+`git+https://github.com/wharton/wharton-cosign-auth.git`
 
 An example requirements.txt is located in examples/. You can also install via pip:
 
-`pip install git+https://github.com/wharton/django-penn-auth.git`
+`pip install git+https://github.com/wharton/wharton-cosign-auth.git`
 
 Middleware and authentication backends in settings.py
 --------------------------------------
@@ -37,15 +37,52 @@ MIDDLEWARE_CLASSES = (
 )
 
 AUTHENTICATION_BACKENDS = (
-    'penn_auth.remote_user.PennRemoteUserBackend',
+    'wharton_cosign_auth.remote_user.WhartonRemoteUserBackend',
     'django.contrib.auth.backends.RemoteUserBackend',
 )
 
 INSTALLED_APPS = (
     'bootstrap3',
-    'penn_auth',
+    'wharton_cosign_auth',
 )
 ```
+Logging out
+-----------
+To add a logout function to your urls.py, do the following:
+
+```
+from django.conf.urls import patterns, include, url
+from django.contrib import admin
+
+from wharton_cosign_auth.views import penn_logout
+
+
+urlpatterns = patterns('',
+    url(r'^admin/', include(admin.site.urls)),
+    url(r'^logout/', penn_logout, name='penn-logout'),
+)
+```
+
+Using Built-in Permissions to Decorate Views
+--------------------------------------------
+wharton_cosign_auth gives you the ability to use view decorators using Wharton permissions.
+Simply decorate a view by doing something similar to the following:
+
+```
+from django.http import HttpResponse
+
+from wharton_cosign_auth.permissions import wharton_permission
+
+
+@wharton_permission(['STAFF', 'WCIT'])
+def my_view(request):
+    return HttpResponse("Hello, World!")
+```
+
+The decorator checks https://apps.wharton.upenn.edu/api/v1/adgroups endpoint to see if the
+user is in the supplied group(s).  If not, a 403 Forbidden will be returned.
+
+Just make sure you pass a list (i.e. ['MKTG-STAFF']) even if you are only checking against one group.
 
 Feel free to contact me with questions: sturoscy@wharton.upenn.edu
 

@@ -3,7 +3,7 @@ from django.http import HttpResponseBadRequest
 
 from functools import wraps
 
-from penn_auth.utilities import call_wisp_api
+from wharton_cosign_auth.utilities import call_wisp_api
 
 
 def wharton_permission(permissions):

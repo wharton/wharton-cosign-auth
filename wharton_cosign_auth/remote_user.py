@@ -1,10 +1,10 @@
 from django.contrib.auth.backends import RemoteUserBackend
 from django.core.exceptions import PermissionDenied
 
-from penn_auth.utilities import call_wisp_api
+from wharton_cosign_auth.utilities import call_wisp_api
 
 
-class PennRemoteUserBackend(RemoteUserBackend):
+class WhartonRemoteUserBackend(RemoteUserBackend):
 
     def configure_user(self, user):
         response = call_wisp_api(
