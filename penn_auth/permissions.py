@@ -10,6 +10,8 @@ def wharton_permission(permissions):
     def wharton(func):
         @wraps(func)
         def wrapper(request, *args, **kwargs):
+            if not isinstance(permissions, list):
+                permissions = [permissions]
             if request.META.get('REMOTE_USER') is not None:
                 url = 'https://apps.wharton.upenn.edu/wisp/api/v1/adgroups/%s' % request.META.get(
                     'REMOTE_USER')
