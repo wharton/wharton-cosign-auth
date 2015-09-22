@@ -17,7 +17,8 @@ def wharton_permission(permissions):
                 # Check for empty response
                 if response.get('groups'):
                     # Check if user is in the requested groups
-                    permission_check = [ permission for permission in permissions if permission in response.get('groups') ]
+                    permission_check = [
+                        permission for permission in permissions if permission in response.get('groups')]
                     if permission_check:
                         return func(request, *args, **kwargs)
                     else:
