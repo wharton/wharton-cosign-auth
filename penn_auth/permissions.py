@@ -10,6 +10,7 @@ def wharton_permission(permissions):
     def wharton(func):
         @wraps(func)
         def wrapper(request, *args, **kwargs):
+            global permissions
             if not isinstance(permissions, list):
                 permissions = [permissions]
             if request.META.get('REMOTE_USER') is not None:
