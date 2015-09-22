@@ -6,7 +6,7 @@ from functools import wraps
 from penn_auth.utilities import call_wisp_api
 
 
-def wharton_permission(permission):
+def wharton_permission(permissions):
     def wharton(func):
         @wraps(func)
         def wrapper(request, *args, **kwargs):
@@ -17,10 +17,11 @@ def wharton_permission(permission):
                 # Check for empty response
                 if response.get('groups'):
                     # Check if user is in the requested groups
-                    if str(permission) in response.get('groups'):
-                        return func(request, *args, **kwargs)
-                    else:
-                        raise PermissionDenied
+                    for permssion in permissions:
+                        if str(permission) in response.get('groups'):
+                            return func(request, *args, **kwargs)
+                        else:
+                            raise PermissionDenied
                 else:
                     # Return a bad request for no groups found
                     return HttpResponseBadRequest(
