@@ -7,12 +7,12 @@ from penn_auth.utilities import call_wisp_api
 
 
 def wharton_permission(permissions):
+    if not isinstance(permissions, list):
+        permissions = [permissions]
+        
     def wharton(func):
         @wraps(func)
         def wrapper(request, *args, **kwargs):
-            global permissions
-            if not isinstance(permissions, list):
-                permissions = [permissions]
             if request.META.get('REMOTE_USER') is not None:
                 url = 'https://apps.wharton.upenn.edu/wisp/api/v1/adgroups/%s' % request.META.get(
                     'REMOTE_USER')
