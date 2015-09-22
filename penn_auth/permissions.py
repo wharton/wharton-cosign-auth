@@ -1,4 +1,5 @@
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseBadRequest
 
 from functools import wraps
 
@@ -13,10 +14,17 @@ def wharton_permission(permission):
                 url = 'https://apps.wharton.upenn.edu/wisp/api/v1/adgroups/%s' % request.META.get(
                     'REMOTE_USER')
                 response = call_wisp_api(url)
-                if str(permission) in response.get('groups'):
-                    return func(request, *args, **kwargs)
+                # Check for empty response
+                if response.get('groups'):
+                    # Check if user is in the requested groups
+                    if str(permission) in response.get('groups'):
+                        return func(request, *args, **kwargs)
+                    else:
+                        raise PermissionDenied
                 else:
-                    raise PermissionDenied
+                    # Return a bad request for no groups found
+                    return HttpResponseBadRequest(
+                        "No groups found for user %s" % request.META.get('REMOTE_USER'))
             else:
                 raise PermissionDenied
         return wrapper
