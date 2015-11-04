@@ -91,7 +91,7 @@ Running Test Suite
 To run the tests for wharton cosign-auth first make sure you have the correct dependencies installed. Then execute tests.py by navigating into wharton_cosign_auth
 
 ```
-pip install requirements.txt
+pip install -r requirements.txt
 cd wharton_cosign_auth
 python tests.py
 ```
