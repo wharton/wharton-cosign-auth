@@ -121,7 +121,7 @@ class TestRemoteBackend(unittest.TestCase):
         x = WhartonRemoteUserBackend()
         x.configure_user(user)
  
-        self.assertTrue(user.is_staff)
+        self.assertFalse(user.is_staff)
         self.assertEqual(user.last_name, 'Dude')
         self.assertEqual(user.first_name, 'Tester')
         self.assertEqual(user.email, 'x@skip.com')
