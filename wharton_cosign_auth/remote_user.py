@@ -19,7 +19,7 @@ class WhartonRemoteUserBackend(RemoteUserBackend):
             Setting is_staff to True on the django user model
             Gives the user access to additional django functions
             '''
-            user.is_staff = True
+            user.is_staff = False
             user.save()
         else:
             '''
