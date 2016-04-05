@@ -99,6 +99,17 @@ Just make sure you pass a list (i.e. ['MKTG-STAFF']) even if you are only checki
 
 Feel free to contact me with questions: sturoscy@wharton.upenn.edu
 
+Running Test Suite
+------------------
+To run the tests for wharton cosign-auth first make sure you have the correct dependencies installed. Then execute tests.py by navigating into wharton_cosign_auth
+
+```
+pip install -r requirements.txt
+cd wharton_cosign_auth
+python tests.py
+```
+
+
 CONTRIBUTORS:
 -------------
 * Stephen Turoscy
