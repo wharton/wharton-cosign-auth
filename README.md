@@ -4,7 +4,7 @@ Django Wharton CoSign Login and Permissions
 Installing CoSign and setting up Apache
 ---------------------------------------
 See [ISC's Apache Cosign instructions](http://www.upenn.edu/computing/weblogin/docs/apache_installation.html)
-for step-by-step instructions. An example Apache httpd conf file is located in examples/.
+for step-by-step instructions.
 
 Installing the Django app
 -------------------------
@@ -18,10 +18,10 @@ An example requirements.txt is located in examples/. You can also install via pi
 
 Middleware and authentication backends in settings.py
 --------------------------------------
-In order to integrate CoSign with the Django auth system, 
-we have to tell Django to use the `REMOTE_USER` server variable. 
+In order to integrate CoSign with the Django auth system,
+we have to tell Django to use the `REMOTE_USER` server variable.
 You can use `RemoteUserMiddleware` that ships with Django, or
-the custom `PennRemoteUserBackend` from this module, which subclasses 
+the custom `PennRemoteUserBackend` from this module, which subclasses
 `RemoteUserMiddleware` to remove password handling, since Cosign handles passwords during authentication.
 
 Here is an example of this configuration:
@@ -46,6 +46,19 @@ INSTALLED_APPS = (
     'wharton_cosign_auth',
 )
 ```
+
+.htaccess file:
+
+To protect your app using cosign and penn's login, you will need to add an .htaccess file to the root
+of your application (this will essentially lockdown your entire app behind cosign):
+
+```
+CosignProtected On
+AuthType Cosign
+Require valid-user
+CosignRequireFactor  UPENN.EDU
+```
+
 Logging out
 -----------
 To add a logout function to your urls.py, do the following:
