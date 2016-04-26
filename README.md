@@ -38,7 +38,7 @@ MIDDLEWARE_CLASSES = (
 
 AUTHENTICATION_BACKENDS = (
     'wharton_cosign_auth.remote_user.WhartonRemoteUserBackend',
-    'django.contrib.auth.backends.RemoteUserBackend',
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 INSTALLED_APPS = (
