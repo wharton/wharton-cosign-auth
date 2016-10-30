@@ -114,3 +114,4 @@ CONTRIBUTORS:
 -------------
 * Stephen Turoscy
 * Timothy Allen
+* Bradley Martin

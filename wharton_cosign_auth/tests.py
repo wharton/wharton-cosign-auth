@@ -69,7 +69,7 @@ class TestPermissions(unittest.TestCase):
         with self.assertRaises(PermissionDenied) as cm:
             response(request)
         klass_name = cm.exception.__class__.__name__
-        self.assertEqual(klass_name, 'PermissionDenied') 
+        self.assertEqual(klass_name, 'PermissionDenied')
 
     @patch('permissions.call_wisp_api', return_value={'groups': 'FAIL'})
     def test_wharton_permission__permission_denied(self, _call_wisp_api):
@@ -112,33 +112,73 @@ class TestRemoteBackend(unittest.TestCase):
     """ Test Suite for remote_user.py """
 
 
-    @patch('remote_user.call_wisp_api')
-    def test_configure_user__User_Exists_And_Is_Apart_of_Wharton(self, _call_wisp_api):
+    def test_configure_user__User_Exists_And_Is_Apart_of_Wharton(self):
         """ Test Case - configure user will add user to django model """
 
-        _call_wisp_api.return_value = {'results': [{'first_name': 'Tester', 'last_name': 'Dude', 'email': 'x@skip.exchange.com' }]} 
-        user = Mock(username='dude') 
+        response = {'results': [{'first_name': 'Tester', 'last_name': 'Dude', 'email': 'x@skip.exchange.com' }]}
+        user = Mock(username='dude')
         x = WhartonRemoteUserBackend()
-        x.configure_user(user)
- 
+        x.configure_user(user, response)
+
         self.assertFalse(user.is_staff)
         self.assertEqual(user.last_name, 'Dude')
         self.assertEqual(user.first_name, 'Tester')
         self.assertEqual(user.email, 'x@skip.com')
         self.assertTrue(user.save.called)
 
-    @patch('remote_user.call_wisp_api')
-    def test_configure_user__User_Does_Not_Exists(self, _call_wisp_api):
-        """ Test Case - """
+    def test_authenticate__no_remote_user(self):
+        """ """
 
-        _call_wisp_api.return_value = {'results': []}
-        user = Mock(username='fail')
         x = WhartonRemoteUserBackend()
-        
-        with self.assertRaises(PermissionDenied) as cm:
-            x.configure_user(user)
-        klass_name = cm.exception.__class__.__name__
-        self.assertEqual(klass_name, 'PermissionDenied')
+        user = x.authenticate(None)
+        self.assertIsNone(user)
+
+    @patch('remote_user.WhartonRemoteUserBackend.configure_user', return_value='created_user')
+    @patch('remote_user.call_wisp_api', return_value={'results':
+        [{'first_name': 'Tester', 'last_name': 'Dude', 'email': 'x@skip.exchange.com' }]})
+    @patch('remote_user.get_user_model')
+    def test_autenticate__create_unknown_user_who_is_wharton(self, _get_user_model, _call_wisp_api, _configure_user):
+        """ """
+
+        _get_user_model()._default_manager.get_or_create.return_value = ('created_user', True)
+        _get_user_model().USERNAME_FIELD = 'username'
+        x = WhartonRemoteUserBackend()
+        user = x.authenticate('tester')
+
+        self.assertEqual(user, 'created_user')
+        self.assertTrue(_configure_user.called)
+        _get_user_model()._default_manager.get_or_create.assert_called_once_with(username='tester')
+        _call_wisp_api.assert_called_once_with(
+            'https://apps.wharton.upenn.edu/wisp/api/v1/adusers', {'username': 'tester'})
+
+    @patch('remote_user.WhartonRemoteUserBackend.configure_user', return_value='created_user')
+    @patch('remote_user.call_wisp_api', return_value={'results':
+        [{'first_name': 'Tester', 'last_name': 'Dude', 'email': 'x@skip.exchange.com' }]})
+    @patch('remote_user.get_user_model')
+    def test_autenticate__user_already_created_who_is_wharton(self, _get_user_model, _call_wisp_api, _configure_user):
+        """ """
+
+        _get_user_model()._default_manager.get_or_create.return_value = ('created_user', False)
+        _get_user_model().USERNAME_FIELD = 'username'
+        x = WhartonRemoteUserBackend()
+        user = x.authenticate('tester')
+
+        self.assertEqual(user, 'created_user')
+        self.assertFalse(_configure_user.called)
+        _get_user_model()._default_manager.get_or_create.assert_called_once_with(username='tester')
+        _call_wisp_api.assert_called_once_with(
+            'https://apps.wharton.upenn.edu/wisp/api/v1/adusers', {'username': 'tester'})
+
+    @patch('remote_user.get_user_model')
+    def test_autenticate__do_not_create_unknown_user(self, _get_user_model):
+        """ """
+        _get_user_model()._default_manager.get_by_natural_key.return_value = 'tester'
+        x = WhartonRemoteUserBackend()
+        x.create_unknown_user = False
+        user = x.authenticate('tester')
+
+        self.assertEqual(user, 'tester')
+        _get_user_model()._default_manager.get_by_natural_key.assert_called_once_with('tester')
 
 class TestUtilities(unittest.TestCase):
 
@@ -158,7 +198,7 @@ class TestUtilities(unittest.TestCase):
         expected = call(None, headers={'Authorization': 'Token Test'}, params=None)
 
         self.assertTrue(_json.json.called)
-        self.assertTrue(_requests.get.called) 
+        self.assertTrue(_requests.get.called)
         self.assertTrue(_requests.get.call_args == expected)
 
     @patch('utilities.settings', new_callable=PropertyMock)
@@ -174,8 +214,21 @@ class TestUtilities(unittest.TestCase):
         response = call_wisp_api(url='https://testers.com', params={'user_id': 'tester'})
         expected = call('https://testers.com', headers={'Authorization': 'Token Test'}, params={'user_id': 'tester'})
         self.assertTrue(_json.json.called)
-        self.assertTrue(_requests.get.called) 
+        self.assertTrue(_requests.get.called)
         self.assertTrue(_requests.get.call_args == expected)
+
+    @patch('utilities.settings', new_callable=PropertyMock)
+    @patch('utilities.requests')
+    def test_class_wisp_api__wisp_api_is_down_exception_will_raise(self, _requests, _settings):
+        """ Test Case - call wisp api but api is down an exception will raise """
+
+        _settings.WISP_TOKEN = 'Test'
+        _requests.get.side_effect = ValueError
+
+        with self.assertRaises(Exception) as cm:
+            response = call_wisp_api(url='https://testers.com', params={'user_id': 'tester'})
+
+        self.assertEqual('WISP did not return valid JSON. This may be due to WISP API being down.', str(cm.exception))
 
 if __name__ == '__main__':
     unittest.main()
