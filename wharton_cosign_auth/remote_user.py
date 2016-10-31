@@ -10,7 +10,7 @@ class WhartonRemoteUserBackend(RemoteUserBackend):
         """
         Reject users with is_active=False. Custom user models that don't have
         that attribute are allowed. Moving here for future proof of apps running
-        on django >= 1.10
+        on django < 1.10
         """
 
         is_active = getattr(user, 'is_active', None)
@@ -48,7 +48,7 @@ class WhartonRemoteUserBackend(RemoteUserBackend):
 
     def configure_user(self, user, response):
         """
-        Set base attributed for newly created user based on ADUSER from
+        Set base attributes for newly created user based on ADUSER from
         the Wisp API
         """
 

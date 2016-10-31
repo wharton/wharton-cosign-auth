@@ -10,6 +10,7 @@ from views import penn_logout
 
 import unittest
 
+
 class TestPermissions(unittest.TestCase):
 
     """ Test Suite for permissions.py """
@@ -91,6 +92,7 @@ class TestViews(unittest.TestCase):
 
     """ Test Suite for views.py """
 
+
     @patch('views.redirect')
     @patch('views.logout')
     def test_penn_logout__User_is_logged_out(self, _logout, _redirect):
@@ -127,7 +129,7 @@ class TestRemoteBackend(unittest.TestCase):
         self.assertTrue(user.save.called)
 
     def test_authenticate__no_remote_user(self):
-        """ """
+        """ Test Case - no remote user is returned from cosign """
 
         x = WhartonRemoteUserBackend()
         user = x.authenticate(None)
@@ -138,7 +140,7 @@ class TestRemoteBackend(unittest.TestCase):
         [{'first_name': 'Tester', 'last_name': 'Dude', 'email': 'x@skip.exchange.com' }]})
     @patch('remote_user.get_user_model')
     def test_autenticate__create_unknown_user_who_is_wharton(self, _get_user_model, _call_wisp_api, _configure_user):
-        """ """
+        """ Test Case - create unknown user who is apart of wharton  """
 
         _get_user_model()._default_manager.get_or_create.return_value = ('created_user', True)
         _get_user_model().USERNAME_FIELD = 'username'
@@ -156,7 +158,7 @@ class TestRemoteBackend(unittest.TestCase):
         [{'first_name': 'Tester', 'last_name': 'Dude', 'email': 'x@skip.exchange.com' }]})
     @patch('remote_user.get_user_model')
     def test_autenticate__user_already_created_who_is_wharton(self, _get_user_model, _call_wisp_api, _configure_user):
-        """ """
+        """ Test Case - user already exists and they are a member of the school """
 
         _get_user_model()._default_manager.get_or_create.return_value = ('created_user', False)
         _get_user_model().USERNAME_FIELD = 'username'
@@ -171,7 +173,8 @@ class TestRemoteBackend(unittest.TestCase):
 
     @patch('remote_user.get_user_model')
     def test_autenticate__do_not_create_unknown_user(self, _get_user_model):
-        """ """
+        """ Test Case - setting is set to no create an unknown user """
+
         _get_user_model()._default_manager.get_by_natural_key.return_value = 'tester'
         x = WhartonRemoteUserBackend()
         x.create_unknown_user = False
@@ -180,9 +183,11 @@ class TestRemoteBackend(unittest.TestCase):
         self.assertEqual(user, 'tester')
         _get_user_model()._default_manager.get_by_natural_key.assert_called_once_with('tester')
 
+
 class TestUtilities(unittest.TestCase):
 
     """ Test Suite for utilities.py """
+
 
     @patch('utilities.settings', new_callable=PropertyMock)
     @patch('utilities.requests', autospec=True)
