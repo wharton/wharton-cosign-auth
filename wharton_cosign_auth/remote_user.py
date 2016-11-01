@@ -21,6 +21,8 @@ class WhartonRemoteUserBackend(RemoteUserBackend):
             '''
             user.is_staff = False
             user.save()
+
+            return user
         else:
             '''
             Even though someone can login with Pennkey, there is a chance
