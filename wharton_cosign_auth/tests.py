@@ -1,7 +1,7 @@
 from django.conf import settings
 settings.configure()
 
-from unittest.mock import Mock, patch, PropertyMock, call
+from unittest.mock import Mock, patch, PropertyMock, call, MagicMock
 from django.core.exceptions import PermissionDenied
 from remote_user import WhartonRemoteUserBackend
 from permissions import wharton_permission
@@ -132,13 +132,29 @@ class TestRemoteBackend(unittest.TestCase):
         """ Test Case - """
 
         _call_wisp_api.return_value = {'results': []}
-        user = Mock(username='fail')
+        user = MagicMock()
+        test_user_prop = PropertyMock(return_value='fail')
+
+        type(user).username = test_user_prop
         x = WhartonRemoteUserBackend()
-        
-        with self.assertRaises(PermissionDenied) as cm:
-            x.configure_user(user)
-        klass_name = cm.exception.__class__.__name__
-        self.assertEqual(klass_name, 'PermissionDenied')
+
+        x.configure_user(user)
+        print(dir(user))
+        self.assertTrue(test_user_prop.called)
+
+    @patch('remote_user.call_wisp_api')
+    def test_configure_user__User_Does_Not_Have_Email(self, _call_wisp_api):
+        """ Test Case - No error on user with null email """
+        _call_wisp_api.return_value = {'results': [{'first_name': 'Tester', 'last_name': 'Dude', 'email': None }]}
+        user = Mock(username='dude')
+        x = WhartonRemoteUserBackend()
+        x.configure_user(user)
+
+        self.assertFalse(user.is_staff)
+        self.assertEqual(user.last_name, 'Dude')
+        self.assertEqual(user.first_name, 'Tester')
+        self.assertEqual(user.email, None)
+        self.assertTrue(user.save.called)
 
 class TestUtilities(unittest.TestCase):
 

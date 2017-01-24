@@ -1,5 +1,4 @@
 from django.contrib.auth.backends import RemoteUserBackend
-from django.core.exceptions import PermissionDenied
 
 from wharton_cosign_auth.utilities import call_wisp_api
 
@@ -13,7 +12,7 @@ class WhartonRemoteUserBackend(RemoteUserBackend):
             results = response['results'][0]
             user.first_name = results['first_name']
             user.last_name = results['last_name']
-            user.email = results['email'].replace('exchange.', '')
+            user.email = [None if not results['email'] else results['email'].replace('exchange.','')][0]
 
             '''
             Setting is_staff to True on the django user model
@@ -21,9 +20,11 @@ class WhartonRemoteUserBackend(RemoteUserBackend):
             '''
             user.is_staff = False
             user.save()
+
+            return user
         else:
             '''
             Even though someone can login with Pennkey, there is a chance
-            the user is not a Wharton user; in this case, raise a PermissionDenied
+            the user is not a Wharton user; in this case, just return the user object since raising a PermissionDenied doesn't do anything and let the app control the access
             '''
-            raise PermissionDenied
+            return user
