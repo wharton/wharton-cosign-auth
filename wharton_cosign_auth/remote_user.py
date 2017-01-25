@@ -12,7 +12,7 @@ class WhartonRemoteUserBackend(RemoteUserBackend):
             results = response['results'][0]
             user.first_name = results['first_name']
             user.last_name = results['last_name']
-            user.email = results['email'].replace('exchange.', '')
+            user.email = [None if not results['email'] else results['email'].replace('exchange.','')][0]
 
             '''
             Setting is_staff to True on the django user model
