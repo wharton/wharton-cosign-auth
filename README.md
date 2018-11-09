@@ -1,5 +1,10 @@
-Django Wharton CoSign Login and Permissions
-===========================================
+DEPRECATED: Django Wharton CoSign Login and Permissions
+=======================================================
+
+This module is deprecated, as Wharton/Penn no longer support CoSign.
+====================================================================
+
+We are leaving the code intact in case it helps anyone else still using CoSign (but you should be using Shibboleth like the rest of us).
 
 Installing CoSign and setting up Apache
 ---------------------------------------
